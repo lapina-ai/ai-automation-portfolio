@@ -19,12 +19,12 @@
 
 | Проект | Стек | Результат |
 | :--- | :--- | :--- |
-| **[RAG-Ассистент Инженера](./01_rag_assistant/)** | n8n, Qdrant, LM Studio, Docker, Python | Поиск по документации: 15 мин → 1 мин |
-| **[Автоматизация договоров](./02_make_contracts/)** | Make, Perplexity AI, Notion, Gmail | Полный цикл: от формы до PDF |
-| **[AI-анализ отзывов](./03_ai_feedback/)** | Make, Router, Notion, Perplexity AI | Автоматическая оценка CSAT/NPS |
-| **[Telegram-бот](./04_telegram_bot/)** | Make, Telegram Bot, Notion | Обработка обращений с ветвлением |
-| **[Сайт ECOSlice](./05_ecoslice_site/)** | Tilda, Make, Google Sheets | Сайт + AI-обработка заявок |
-| **[Юнит-экономика](./06_powerbi_economics/)** | Excel, Power Query, Power BI | Дашборд, потенциал роста +340% |
+| **[RAG-Ассистент Инженера](./01_RAG_Ассистент_Инженера/)** | n8n, Qdrant, LM Studio, Docker, Python | Поиск по документации: 15 мин → 1 мин |
+| **[Flask: ML + LLM](./02_Flask_ML_AI_Агент/)** | Python, Flask, OpenRouter API | Веб-приложение: рекомендации и бизнес-идеи |
+| **[Автоматизация договоров и отзывов](./03_Автоматизация_Make/)** | Make, Perplexity AI, Notion, Gmail | Цикл: от формы до PDF + AI-анализ отзывов |
+| **[Telegram-бот](./04_Telegram_бот/)** | Make, Telegram Bot, Notion | Обработка обращений с ветвлением |
+| **[Сайт ECOSlice](./05_Сайт_ECOSlice/)** | Tilda, Make, Google Sheets | Сайт + AI-обработка заявок |
+| **[Юнит-экономика](./06_Юнит-экономика_PowerBI/)** | Excel, Power Query, Power BI | Дашборд, потенциал роста +340% |
 
 ## 🛠 Навыки
 `n8n` `Make` `Python` `RAG` `Qdrant` `Docker` `Power BI` `Excel` `1С` `REST API` `BPMN (базовый)` `SQL (базовый)`
