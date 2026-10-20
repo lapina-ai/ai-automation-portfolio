@@ -20,7 +20,7 @@
 | Проект | Стек | Результат |
 | :--- | :--- | :--- |
 | **[RAG-Ассистент Инженера](./01_RAG_Ассистент_Инженера/)** | n8n, Qdrant, LM Studio, Docker, Python | Поиск по документации: 15 мин → 1 мин |
-| **[Flask: ML + LLM](./02_Flask_ML_AI_Агент/)** | Python, Flask, OpenRouter API | Веб-приложение: рекомендации и бизнес-идеи |
+| **[Flask: ML + LLM](./02_Flask_ML_AI_Agent/)** | Python, Flask, OpenRouter API | Веб-приложение: рекомендации и бизнес-идеи |
 | **[Автоматизация договоров и отзывов](./03_Автоматизация_Make/)** | Make, Perplexity AI, Notion, Gmail | Цикл: от формы до PDF + AI-анализ отзывов |
 | **[Telegram-бот](./04_Telegram_бот/)** | Make, Telegram Bot, Notion | Обработка обращений с ветвлением |
 | **[Сайт ECOSlice](./05_Сайт_ECOSlice/)** | Tilda, Make, Google Sheets | Сайт + AI-обработка заявок |
