@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Ассистент Инженера</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1300px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1 1 auto;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .machine-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .machine-card {
+            flex: 1 1 200px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+        }
+        
+        .machine-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.2);
+        }
+        
+        .machine-card.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+        
+        .machine-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .machine-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .machine-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .machine-model {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .doc-type-selector {
+            margin-bottom: 25px;
+        }
+        
+        .doc-type-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .doc-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .doc-type-option {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .doc-type-option:hover {
+            border-color: #667eea;
+        }
+        
+        .doc-type-option.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+            font-weight: 600;
+        }
+        
+        .query-input {
+            margin-bottom: 25px;
+        }
+        
+        .query-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .example-queries {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .example-query {
+            background: #f5f5f5;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .example-query:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn, .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .btn:hover, .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+        
+        .btn:disabled, .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-red {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-yellow {
+            background: #ffc107;
+            color: black;
+        }
+        
+        .btn-green {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-blue {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-purple {
+            background: #9b59b6;
+            color: white;
+        }
+        .btn-purple:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(155, 89, 182, 0.4);
+        }
+
+        .btn-orange {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-orange:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4);
+        }
+        
+        .response {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        
+        .response.show {
+            display: block;
+        }
+        
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .response-header h3 {
+            color: #333;
+        }
+        
+        .response-meta {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .response-content {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fee;
+            color: #c00;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .journal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .journal-tab {
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .journal-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .journal-tab.red.active {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .journal-tab.yellow.active {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: black;
+        }
+        
+        .journal-tab.green.active {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        /* Стили для таблиц с прокруткой */
+        .table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 300px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background: #667eea;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 800px;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-red {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-yellow {
+            background: #ffc107;
+            color: black;
+        }
+        
+        .badge-green {
+            background: #28a745;
+            color: white;
+        }
+        
+        .file-list {
+            margin-bottom: 30px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .file-info {
+            flex: 1 1 300px;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .file-meta {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .update-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .update-status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .update-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .maintenance-badge {
+            background: #ffc107;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .scroll-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .scroll-hint::before {
+            content: "⬇️";
+            font-size: 14px;
+        }
+        
+        .scroll-hint::after {
+            content: "⬇️";
+            font-size: 14px;
+        }
+
+        /* Стили для редактора документов */
+        .docs-editor {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .docs-editor h3 {
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .docs-editor textarea {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .docs-editor textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .docs-toolbar {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Ассистент Инженера</h1>
+            <p>Умный поиск и управление документацией</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalPoints">0</div>
+                    <div class="stat-label">всего записей</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="machineAPoints">0</div>
+                    <div class="stat-label">станок А</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="machineBPoints">0</div>
+                    <div class="stat-label">станок Б</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('search')">🔍 Поиск</div>
+            <div class="tab" onclick="switchTab('journal')">📋 Журнал учета</div>
+            <div class="tab" onclick="switchTab('docs')">📚 Документация</div>
+        </div>
+        
+        <div class="content">
+            <!-- ВКЛАДКА ПОИСКА -->
+            <div id="searchPanel" class="panel active">
+                <div class="machine-selector">
+                    <div class="machine-card" data-machine="A" onclick="selectMachine('A')">
+                        <div class="machine-icon">⚙️</div>
+                        <div class="machine-name">Станок А</div>
+                        <div class="machine-model">HAAS VF-2</div>
+                    </div>
+                    
+                    <div class="machine-card" data-machine="B" onclick="selectMachine('B')">
+                        <div class="machine-icon">🔧</div>
+                        <div class="machine-name">Станок Б</div>
+                        <div class="machine-model">TRUMPF TruLaser 3030</div>
+                    </div>
+                </div>
+                
+                <div class="doc-type-selector">
+                    <label>📋 Тип документа:</label>
+                    <div class="doc-types">
+                        <div class="doc-type-option" data-doctype="error_codes" onclick="selectDocType('error_codes')">⚠️ Коды ошибок</div>
+                        <div class="doc-type-option" data-doctype="manual" onclick="selectDocType('manual')">📖 Инструкция по эксплуатации</div>
+                        <div class="doc-type-option" data-doctype="maintenance" onclick="selectDocType('maintenance')">🔧 График обслуживания</div>
+                        <div class="doc-type-option" data-doctype="certificates" onclick="selectDocType('certificates')">📜 Сертификаты</div>
+                        <div class="doc-type-option" data-doctype="journal" onclick="selectDocType('journal')">📋 Журнал учета</div>
+                    </div>
+                </div>
+                
+                <div class="query-input">
+                    <label>❓ Ваш вопрос:</label>
+                    <textarea id="prompt" placeholder="Например: код ошибки E101, процедура запуска, график смазки..."></textarea>
+                    
+                    <div class="example-queries">
+                        <span class="example-query" onclick="setExample('E101')">E101</span>
+                        <span class="example-query" onclick="setExample('процедура запуска')">процедура запуска</span>
+                        <span class="example-query" onclick="setExample('график обслуживания')">график обслуживания</span>
+                        <span class="example-query" onclick="setExample('сертификат соответствия')">сертификат соответствия</span>
+                        <span class="example-query" onclick="setExample('когда меняли фрезу')">когда меняли фрезу</span>
+                        <span class="example-query" onclick="setExample('последние поломки')">последние поломки</span>
+                    </div>
+                </div>
+                
+                <button class="submit-btn" onclick="sendQuery()" id="submitBtn">🔍 Получить ответ</button>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Ищем ответ в документации...</p>
+                </div>
+                
+                <div class="error" id="error"></div>
+                
+                <div class="response" id="response">
+                    <div class="response-header">
+                        <h3>📌 Ответ:</h3>
+                        <span class="response-meta" id="responseMeta"></span>
+                    </div>
+                    <div class="response-content" id="responseContent"></div>
+                </div>
+            </div>
+            
+            <!-- ВКЛАДКА ЖУРНАЛА УЧЕТА (БЕЗ ПОИСКА) -->
+            <div id="journalPanel" class="panel">
+                <h2 style="margin-bottom: 15px;">📋 Журнал учета событий</h2>
+                
+                <div class="warning-box">
+                    ⚠️ Записи о поломках, осмотрах и заменах
+                </div>
+                
+                <div class="machine-selector">
+                    <div class="machine-card" id="journalMachineA">
+                        <div class="machine-icon">⚙️</div>
+                        <div class="machine-name">Станок А</div>
+                        <div class="machine-model">HAAS VF-2</div>
+                    </div>
+                    <div class="machine-card" id="journalMachineB">
+                        <div class="machine-icon">🔧</div>
+                        <div class="machine-name">Станок Б</div>
+                        <div class="machine-model">TRUMPF TruLaser 3030</div>
+                    </div>
+                </div>
+                
+                <div id="journalContent" style="display: block;">
+                    <!-- Вкладки типов событий -->
+                    <div class="journal-tabs">
+                        <div class="journal-tab red active" id="tabBreakdowns">🔴 Поломки</div>
+                        <div class="journal-tab yellow" id="tabInspections">🟡 Плановые осмотры</div>
+                        <div class="journal-tab green" id="tabReplacements">🟢 Замены</div>
+                    </div>
+                    
+                    <!-- ФОРМА ДЛЯ ПОЛОМОК -->
+                    <div id="breakdownsForm" class="form-section">
+                        <h3 style="margin-bottom: 15px; color: #dc3545;">🔴 Зарегистрировать поломку</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Дата</label>
+                                <input type="date" id="breakdownDate" value="2026-03-09">
+                            </div>
+                            <div class="form-group">
+                                <label>Код ошибки</label>
+                                <select id="breakdownCode">
+                                    <option value="E101">E101 - Перегруз шпинделя</option>
+                                    <option value="E102">E102 - Низкий уровень СОЖ</option>
+                                    <option value="E103">E103 - Ошибка смазки</option>
+                                    <option value="E104">E104 - Перегрев шпинделя</option>
+                                    <option value="E105">E105 - Ошибка привода</option>
+                                    <option value="other">Другое...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Описание</label>
+                                <input type="text" id="breakdownDesc" placeholder="Что случилось">
+                            </div>
+                            <div class="form-group">
+                                <label>Причина</label>
+                                <input type="text" id="breakdownCause" placeholder="Почему">
+                            </div>
+                            <div class="form-group">
+                                <label>Решение</label>
+                                <input type="text" id="breakdownSolution" placeholder="Как устранили">
+                            </div>
+                            <div class="form-group">
+                                <label>Исполнитель</label>
+                                <select id="breakdownWorker">
+                                    <option value="Иванов И.И.">Иванов И.И.</option>
+                                    <option value="Петров П.П.">Петров П.П.</option>
+                                    <option value="Сидоров С.С.">Сидоров С.С.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn-small btn-red" onclick="addBreakdown()">➕ Записать поломку</button>
+                        </div>
+                    </div>
+                    
+                    <!-- ФОРМА ДЛЯ ОСМОТРОВ -->
+                    <div id="inspectionsForm" class="form-section" style="display: none;">
+                        <h3 style="margin-bottom: 15px; color: #ffc107;">🟡 Записать плановый осмотр</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Дата</label>
+                                <input type="date" id="inspectionDate" value="2026-03-09">
+                            </div>
+                            <div class="form-group">
+                                <label>Тип осмотра</label>
+                                <select id="inspectionType">
+                                    <option value="Ежедневный">Ежедневный</option>
+                                    <option value="Еженедельный">Еженедельный</option>
+                                    <option value="Ежемесячный">Ежемесячный</option>
+                                    <option value="Квартальный">Квартальный</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Что проверяли</label>
+                                <input type="text" id="inspectionItem" placeholder="Например: биение шпинделя">
+                            </div>
+                            <div class="form-group">
+                                <label>Результат</label>
+                                <select id="inspectionResult">
+                                    <option value="Норма">✅ Норма</option>
+                                    <option value="Отклонение">⚠️ Отклонение</option>
+                                    <option value="Требуется ремонт">🔴 Требуется ремонт</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Замечания</label>
+                                <input type="text" id="inspectionNotes" placeholder="Детали">
+                            </div>
+                            <div class="form-group">
+                                <label>Ответственный</label>
+                                <select id="inspectionWorker">
+                                    <option value="Иванов И.И.">Иванов И.И.</option>
+                                    <option value="Петров П.П.">Петров П.П.</option>
+                                    <option value="Сидоров С.С.">Сидоров С.С.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn-small btn-yellow" onclick="addInspection()">➕ Записать осмотр</button>
+                        </div>
+                    </div>
+                    
+                    <!-- ФОРМА ДЛЯ ЗАМЕН -->
+                    <div id="replacementsForm" class="form-section" style="display: none;">
+                        <h3 style="margin-bottom: 15px; color: #28a745;">🟢 Записать замену расходников</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Дата</label>
+                                <input type="date" id="replacementDate" value="2026-03-09">
+                            </div>
+                            <div class="form-group">
+                                <label>Что заменили</label>
+                                <select id="replacementItem">
+                                    <option value="Масло шпинделя">Масло шпинделя</option>
+                                    <option value="СОЖ">СОЖ (охлаждающая жидкость)</option>
+                                    <option value="Фильтры СОЖ">Фильтры СОЖ</option>
+                                    <option value="Ремень шпинделя">Ремень шпинделя</option>
+                                    <option value="Подшипники">Подшипники</option>
+                                    <option value="Фреза">Фреза</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Тип/Артикул</label>
+                                <input type="text" id="replacementType" placeholder="например: ISO VG68">
+                            </div>
+                            <div class="form-group">
+                                <label>Моточасы</label>
+                                <input type="number" id="replacementHours" value="2450">
+                            </div>
+                            <div class="form-group">
+                                <label>Следующая замена</label>
+                                <input type="text" id="replacementNext" placeholder="рассчитается автоматически" readonly value="через 2000 часов">
+                            </div>
+                            <div class="form-group">
+                                <label>Исполнитель</label>
+                                <select id="replacementWorker">
+                                    <option value="Иванов И.И.">Иванов И.И.</option>
+                                    <option value="Петров П.П.">Петров П.П.</option>
+                                    <option value="Сидоров С.С.">Сидоров С.С.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn-small btn-green" onclick="addReplacement()">➕ Записать замену</button>
+                        </div>
+                    </div>
+                    
+                    <!-- ТАБЛИЦЫ С ИСТОРИЕЙ -->
+                    <div>
+                        <div class="table-container" id="breakdownsTable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Код</th>
+                                        <th>Описание</th>
+                                        <th>Причина</th>
+                                        <th>Решение</th>
+                                        <th>Исполнитель</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="breakdownsBody">
+                                    <!-- Данные загрузятся -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="scroll-hint" id="breakdownsScrollHint">Прокрутите для просмотра всех записей</div>
+                    </div>
+                    
+                    <div style="display: none;">
+                        <div class="table-container" id="inspectionsTable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Тип</th>
+                                        <th>Что проверяли</th>
+                                        <th>Результат</th>
+                                        <th>Замечания</th>
+                                        <th>Ответственный</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inspectionsBody">
+                                    <!-- Данные загрузятся -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="scroll-hint" id="inspectionsScrollHint">Прокрутите для просмотра всех записей</div>
+                    </div>
+                    
+                    <div style="display: none;">
+                        <div class="table-container" id="replacementsTable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Что заменили</th>
+                                        <th>Тип/Артикул</th>
+                                        <th>Моточасы</th>
+                                        <th>Следующая замена</th>
+                                        <th>Исполнитель</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="replacementsBody">
+                                    <!-- Данные загрузятся -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="scroll-hint" id="replacementsScrollHint">Прокрутите для просмотра всех записей</div>
+                    </div>
+                    
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button class="btn-small btn-blue" onclick="saveAllJournalData()">💾 Сохранить все в базу знаний</button>
+                    </div>
+                </div>
+                
+                <div class="update-status" id="journalStatus"></div>
+            </div>
+            
+            <!-- ВКЛАДКА ДОКУМЕНТАЦИЯ -->
+            <div id="docsPanel" class="panel">
+                <h2 style="margin-bottom: 15px;">📚 Управление документацией</h2>
+                
+                <div class="warning-box">
+                    ⚠️ Редактирование сертификатов, инструкций и графиков обслуживания
+                </div>
+                
+                <div class="machine-selector">
+                    <div class="machine-card" id="docsMachineA">
+                        <div class="machine-icon">⚙️</div>
+                        <div class="machine-name">Станок А</div>
+                        <div class="machine-model">HAAS VF-2</div>
+                    </div>
+                    <div class="machine-card" id="docsMachineB">
+                        <div class="machine-icon">🔧</div>
+                        <div class="machine-name">Станок Б</div>
+                        <div class="machine-model">TRUMPF TruLaser 3030</div>
+                    </div>
+                </div>
+                
+                <div class="docs-editor">
+                    <h3>📝 Редактор документов</h3>
+                    
+                    <div class="form-group">
+                        <label>Выберите документ для редактирования:</label>
+                        <select id="docFileSelect" style="width: 100%; padding: 10px;">
+                            <option value="certificates.md">📜 Сертификаты (certificates.md)</option>
+                            <option value="error_codes.md">⚠️ Коды ошибок (error_codes.md)</option>
+                            <option value="operation_manual.md">📖 Инструкция по эксплуатации (operation_manual.md)</option>
+                            <option value="maintenance_schedule.md">🔧 График обслуживания (maintenance_schedule.md)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="docs-toolbar">
+                        <button class="btn-small btn-blue" onclick="loadDocument()" style="flex: 1;">
+                            📂 Загрузить документ
+                        </button>
+                        <button class="btn-small btn-green" onclick="saveDocumentToDisk()" style="flex: 1;">
+                            💾 Сохранить на диск
+                        </button>
+                        <button class="btn-small btn-purple" onclick="updateDocumentKnowledgeBase()" style="flex: 1;">
+                            🔄 Обновить базу знаний
+                        </button>
+                    </div>
+                    
+                    <textarea id="docContent" rows="20" placeholder="Здесь появится содержимое документа..."></textarea>
+                    
+                    <div class="hint" style="margin-top: 10px;">
+                        <i>Сначала загрузите документ, внесите изменения, затем сохраните на диск и обновите базу знаний</i>
+                    </div>
+                </div>
+                
+                <div class="update-status" id="docsStatus"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <div>⚙️ Станок А (<span id="footerMachineA">0</span> записей) · Станок Б (<span id="footerMachineB">0</span> записей)</div>
+            <div style="margin-top: 5px; font-size: 12px;">Последнее обновление: <span id="lastUpdate">только что</span></div>
+        </footer>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        // Состояние интерфейса
+        let selectedMachine = null;
+        let selectedDocType = null;
+        let journalMachine = null;
+        let docsMachine = null;
+        let currentJournalTab = 'breakdowns';
+        let lastSavedTimestamp = null;
+        
+        // Данные журнала для каждого станка
+        let journalData = {
+            'A': {
+                breakdowns: [],
+                inspections: [],
+                replacements: []
+            },
+            'B': {
+                breakdowns: [],
+                inspections: [],
+                replacements: []
+            }
+        };
+        
+        // URL для вебхуков
+        const WEBHOOK_URL = 'http://localhost:5678/webhook-test/ai-query';
+        const SEARCH_JOURNAL_URL = 'http://localhost:5678/webhook-test/search-journal';
+        const SAVE_JOURNAL_URL = 'http://localhost:5678/webhook-test/save-journal';
+        
+        // URL для документации
+        const LOAD_DOCUMENT_URL = 'http://localhost:5678/webhook-test/load-document';
+        const SAVE_DOCUMENT_URL = 'http://localhost:5678/webhook-test/save-document';
+        const UPDATE_DOCUMENT_URL = 'http://localhost:5678/webhook-test/update-document';
+        
+        // Загрузка из localStorage
+        function loadFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('journalData');
+                if (savedData) {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.A && parsed.B) {
+                        const yesterday = new Date(Date.now() - 86400000).toISOString();
+                        
+                        parsed.A.breakdowns = parsed.A.breakdowns.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        parsed.A.inspections = parsed.A.inspections.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        parsed.A.replacements = parsed.A.replacements.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        
+                        parsed.B.breakdowns = parsed.B.breakdowns.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        parsed.B.inspections = parsed.B.inspections.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        parsed.B.replacements = parsed.B.replacements.map(item => ({
+                            ...item,
+                            timestamp: item.timestamp || yesterday
+                        }));
+                        
+                        journalData = parsed;
+                        console.log('📦 Загружено из localStorage');
+                    }
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки из localStorage:', e);
+            }
+            updateStats();
+        }
+        
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('journalData', JSON.stringify(journalData));
+                console.log('💾 Сохранено в localStorage');
+            } catch (e) {
+                console.error('Ошибка сохранения в localStorage:', e);
+            }
+        }
+        
+        function updateStats() {
+            const machineATotal = journalData.A.breakdowns.length + journalData.A.inspections.length + journalData.A.replacements.length;
+            const machineBTotal = journalData.B.breakdowns.length + journalData.B.inspections.length + journalData.B.replacements.length;
+            
+            document.getElementById('machineAPoints').textContent = machineATotal;
+            document.getElementById('machineBPoints').textContent = machineBTotal;
+            document.getElementById('totalPoints').textContent = machineATotal + machineBTotal;
+            
+            document.getElementById('footerMachineA').textContent = machineATotal;
+            document.getElementById('footerMachineB').textContent = machineBTotal;
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if (tab === 'search') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('searchPanel').classList.add('active');
+            } else if (tab === 'journal') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('journalPanel').classList.add('active');
+                if (journalMachine) {
+                    showJournalContent();
+                }
+            } else if (tab === 'docs') {
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                document.getElementById('docsPanel').classList.add('active');
+            }
+        }
+        
+        function selectMachine(machine) {
+            selectedMachine = machine;
+            document.querySelectorAll('#searchPanel .machine-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`.machine-card[data-machine="${machine}"]`).classList.add('selected');
+        }
+        
+        function selectDocType(doctype) {
+            selectedDocType = doctype;
+            document.querySelectorAll('.doc-type-option').forEach(o => o.classList.remove('selected'));
+            document.querySelector(`.doc-type-option[data-doctype="${doctype}"]`).classList.add('selected');
+        }
+        
+        function setExample(text) {
+            document.getElementById('prompt').value = text;
+        }
+        
+        async function sendQuery() {
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!selectedMachine) {
+                showError('Пожалуйста, выберите станок');
+                return;
+            }
+            
+            if (!selectedDocType) {
+                showError('Пожалуйста, выберите тип документа');
+                return;
+            }
+            
+            if (!prompt) {
+                showError('Пожалуйста, введите вопрос');
+                return;
+            }
+            
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('response').classList.remove('show');
+            document.getElementById('submitBtn').disabled = true;
+            hideError();
+            
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        machine_id: selectedMachine,
+                        doc_type: selectedDocType,
+                        prompt: prompt
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                let answerText = '';
+                if (data.answer) {
+                    answerText = data.answer;
+                } else if (data.choices && data.choices[0] && data.choices[0].message) {
+                    answerText = data.choices[0].message.content;
+                } else {
+                    answerText = JSON.stringify(data, null, 2);
+                }
+                
+                document.getElementById('responseContent').innerHTML = answerText.replace(/\n/g, '<br>');
+                document.getElementById('responseMeta').textContent = `Станок ${selectedMachine} · ${getDocTypeName(selectedDocType)}`;
+                document.getElementById('response').classList.add('show');
+                
+            } catch (error) {
+                showError('Ошибка при получении ответа: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+        
+        function getDocTypeName(doctype) {
+            const names = {
+                'error_codes': 'Коды ошибок',
+                'manual': 'Инструкция',
+                'maintenance': 'Обслуживание',
+                'certificates': 'Сертификаты',
+                'journal': 'Журнал учета'
+            };
+            return names[doctype] || doctype;
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = '❌ ' + message;
+            errorEl.classList.add('show');
+        }
+        
+        function hideError() {
+            document.getElementById('error').classList.remove('show');
+        }
+        
+        // Функции для журнала учета
+        function selectJournalMachine(machine) {
+            journalMachine = machine;
+            document.getElementById('journalMachineA').classList.remove('selected');
+            document.getElementById('journalMachineB').classList.remove('selected');
+            document.getElementById(`journalMachine${machine}`).classList.add('selected');
+            
+            const savedTimestamp = localStorage.getItem(`lastSaved_${machine}`);
+            lastSavedTimestamp = savedTimestamp || null;
+            console.log(`📅 Последнее сохранение станка ${machine}:`, lastSavedTimestamp || 'никогда');
+            
+            showJournalContent();
+        }
+        
+        function showJournalContent() {
+            document.getElementById('journalContent').style.display = 'block';
+            renderJournalTables();
+            switchJournalTab(currentJournalTab);
+        }
+        
+        function switchJournalTab(tab) {
+            currentJournalTab = tab;
+            
+            document.getElementById('tabBreakdowns').classList.remove('active', 'red', 'yellow', 'green');
+            document.getElementById('tabInspections').classList.remove('active', 'red', 'yellow', 'green');
+            document.getElementById('tabReplacements').classList.remove('active', 'red', 'yellow', 'green');
+            
+            document.getElementById('breakdownsForm').style.display = 'none';
+            document.getElementById('inspectionsForm').style.display = 'none';
+            document.getElementById('replacementsForm').style.display = 'none';
+            
+            document.getElementById('breakdownsTable').parentElement.style.display = 'none';
+            document.getElementById('inspectionsTable').parentElement.style.display = 'none';
+            document.getElementById('replacementsTable').parentElement.style.display = 'none';
+            
+            if (tab === 'breakdowns') {
+                document.getElementById('tabBreakdowns').classList.add('active', 'red');
+                document.getElementById('breakdownsForm').style.display = 'block';
+                document.getElementById('breakdownsTable').parentElement.style.display = 'block';
+            } else if (tab === 'inspections') {
+                document.getElementById('tabInspections').classList.add('active', 'yellow');
+                document.getElementById('inspectionsForm').style.display = 'block';
+                document.getElementById('inspectionsTable').parentElement.style.display = 'block';
+            } else if (tab === 'replacements') {
+                document.getElementById('tabReplacements').classList.add('active', 'green');
+                document.getElementById('replacementsForm').style.display = 'block';
+                document.getElementById('replacementsTable').parentElement.style.display = 'block';
+            }
+        }
+        
+        function addBreakdown() {
+            if (!journalMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const dateInput = document.getElementById('breakdownDate').value;
+            const dateParts = dateInput.split('-');
+            const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+            
+            const newBreakdown = {
+                date: formattedDate,
+                code: document.getElementById('breakdownCode').value,
+                desc: document.getElementById('breakdownDesc').value || 'Не указано',
+                cause: document.getElementById('breakdownCause').value || 'Не указано',
+                solution: document.getElementById('breakdownSolution').value || 'Не указано',
+                worker: document.getElementById('breakdownWorker').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            journalData[journalMachine].breakdowns.push(newBreakdown);
+            renderJournalTables();
+            updateStats();
+            
+            document.getElementById('breakdownDesc').value = '';
+            document.getElementById('breakdownCause').value = '';
+            document.getElementById('breakdownSolution').value = '';
+            
+            saveAllJournalData();
+        }
+        
+        function addInspection() {
+            if (!journalMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const dateInput = document.getElementById('inspectionDate').value;
+            const dateParts = dateInput.split('-');
+            const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+            
+            const newInspection = {
+                date: formattedDate,
+                type: document.getElementById('inspectionType').value,
+                item: document.getElementById('inspectionItem').value || 'Не указано',
+                result: document.getElementById('inspectionResult').value,
+                notes: document.getElementById('inspectionNotes').value || '-',
+                worker: document.getElementById('inspectionWorker').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            journalData[journalMachine].inspections.push(newInspection);
+            renderJournalTables();
+            updateStats();
+            
+            document.getElementById('inspectionItem').value = '';
+            document.getElementById('inspectionNotes').value = '';
+            
+            saveAllJournalData();
+        }
+        
+        function addReplacement() {
+            if (!journalMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const dateInput = document.getElementById('replacementDate').value;
+            const dateParts = dateInput.split('-');
+            const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+            
+            const newReplacement = {
+                date: formattedDate,
+                item: document.getElementById('replacementItem').value,
+                type: document.getElementById('replacementType').value || 'Не указан',
+                hours: document.getElementById('replacementHours').value,
+                next: 'через 2000 часов',
+                worker: document.getElementById('replacementWorker').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            journalData[journalMachine].replacements.push(newReplacement);
+            renderJournalTables();
+            updateStats();
+            
+            document.getElementById('replacementType').value = '';
+            
+            saveAllJournalData();
+        }
+        
+        function renderJournalTables() {
+            if (!journalMachine) return;
+            
+            const data = journalData[journalMachine];
+            
+            // Поломки
+            let breakdownsHtml = '';
+            if (data.breakdowns && data.breakdowns.length > 0) {
+                const sortedBreakdowns = [...data.breakdowns].sort((a, b) => {
+                    const dateA = a.date.split('.').reverse().join('-');
+                    const dateB = b.date.split('.').reverse().join('-');
+                    return dateB.localeCompare(dateA);
+                });
+                
+                sortedBreakdowns.forEach(b => {
+                    breakdownsHtml += `<tr>
+                        <td>${b.date}</td>
+                        <td><span class="status-badge badge-red">${b.code}</span></td>
+                        <td>${b.desc}</td>
+                        <td>${b.cause}</td>
+                        <td>${b.solution}</td>
+                        <td>${b.worker}</td>
+                    </tr>`;
+                });
+            } else {
+                breakdownsHtml = `<tr><td colspan="6" style="text-align: center; color: #666;">Нет записей о поломках</td></tr>`;
+            }
+            document.getElementById('breakdownsBody').innerHTML = breakdownsHtml;
+            
+            // Осмотры
+            let inspectionsHtml = '';
+            if (data.inspections && data.inspections.length > 0) {
+                const sortedInspections = [...data.inspections].sort((a, b) => {
+                    const dateA = a.date.split('.').reverse().join('-');
+                    const dateB = b.date.split('.').reverse().join('-');
+                    return dateB.localeCompare(dateA);
+                });
+                
+                sortedInspections.forEach(i => {
+                    const badgeClass = i.result === 'Норма' ? 'badge-green' : (i.result === 'Отклонение' ? 'badge-yellow' : 'badge-red');
+                    inspectionsHtml += `<tr>
+                        <td>${i.date}</td>
+                        <td>${i.type}</td>
+                        <td>${i.item}</td>
+                        <td><span class="status-badge ${badgeClass}">${i.result}</span></td>
+                        <td>${i.notes}</td>
+                        <td>${i.worker}</td>
+                    </tr>`;
+                });
+            } else {
+                inspectionsHtml = `<tr><td colspan="6" style="text-align: center; color: #666;">Нет записей об осмотрах</td></tr>`;
+            }
+            document.getElementById('inspectionsBody').innerHTML = inspectionsHtml;
+            
+            // Замены
+            let replacementsHtml = '';
+            if (data.replacements && data.replacements.length > 0) {
+                const sortedReplacements = [...data.replacements].sort((a, b) => {
+                    const dateA = a.date.split('.').reverse().join('-');
+                    const dateB = b.date.split('.').reverse().join('-');
+                    return dateB.localeCompare(dateA);
+                });
+                
+                sortedReplacements.forEach(r => {
+                    replacementsHtml += `<tr>
+                        <td>${r.date}</td>
+                        <td>${r.item}</td>
+                        <td>${r.type}</td>
+                        <td>${r.hours}</td>
+                        <td>${r.next}</td>
+                        <td>${r.worker}</td>
+                    </tr>`;
+                });
+            } else {
+                replacementsHtml = `<tr><td colspan="6" style="text-align: center; color: #666;">Нет записей о заменах</td></tr>`;
+            }
+            document.getElementById('replacementsBody').innerHTML = replacementsHtml;
+            
+            // Подсказки прокрутки
+            document.getElementById('breakdownsScrollHint').style.display = data.breakdowns.length > 3 ? 'flex' : 'none';
+            document.getElementById('inspectionsScrollHint').style.display = data.inspections.length > 3 ? 'flex' : 'none';
+            document.getElementById('replacementsScrollHint').style.display = data.replacements.length > 3 ? 'flex' : 'none';
+        }
+        
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ
+        async function saveAllJournalData() {
+            if (!journalMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const statusEl = document.getElementById('journalStatus');
+            statusEl.className = 'update-status';
+            statusEl.textContent = '⏳ Сохранение в базу знаний...';
+            
+            try {
+                const data = journalData[journalMachine];
+                const now = new Date().toISOString();
+                
+                const saveData = {
+                    machine_id: journalMachine,
+                    timestamp: now,
+                    breakdowns: data.breakdowns,
+                    inspections: data.inspections,
+                    replacements: data.replacements
+                };
+                
+                console.log('📤 Отправка данных:', saveData);
+                
+                const response = await fetch(SAVE_JOURNAL_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(saveData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ Ответ от сервера:', result);
+                
+                statusEl.className = 'update-status success';
+                statusEl.textContent = `✅ Сохранено ${result.count || data.breakdowns.length} записей!`;
+                
+                localStorage.setItem(`lastSaved_${journalMachine}`, now);
+                lastSavedTimestamp = now;
+                
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+                saveToLocalStorage();
+                
+            } catch (error) {
+                console.error('❌ Ошибка при сохранении:', error);
+                statusEl.className = 'update-status error';
+                statusEl.textContent = `❌ Ошибка: ${error.message}. Данные сохранены локально.`;
+                saveToLocalStorage();
+            }
+        }
+        
+        // Функции для документации
+        document.getElementById('docsMachineA').addEventListener('click', () => selectDocsMachine('A'));
+        document.getElementById('docsMachineB').addEventListener('click', () => selectDocsMachine('B'));
+        
+        function selectDocsMachine(machine) {
+            docsMachine = machine;
+            document.getElementById('docsMachineA').classList.remove('selected');
+            document.getElementById('docsMachineB').classList.remove('selected');
+            document.getElementById(`docsMachine${machine}`).classList.add('selected');
+            
+            document.getElementById('docContent').value = '';
+            document.getElementById('docsStatus').className = 'update-status';
+            document.getElementById('docsStatus').textContent = '';
+        }
+        
+        async function loadDocument() {
+            if (!docsMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const fileSelect = document.getElementById('docFileSelect');
+            const selectedFile = fileSelect.value;
+            const selectedFileName = fileSelect.options[fileSelect.selectedIndex].text;
+            
+            const statusEl = document.getElementById('docsStatus');
+            statusEl.className = 'update-status';
+            statusEl.textContent = `⏳ Загрузка ${selectedFileName}...`;
+            
+            try {
+                console.log('📤 Загрузка документа:', { fileName: selectedFile, machine_id: docsMachine });
+                
+                const response = await fetch(LOAD_DOCUMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fileName: selectedFile,
+                        machine_id: docsMachine
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ Документ загружен:', result);
+                
+                if (result.content) {
+                    document.getElementById('docContent').value = result.content;
+                    statusEl.className = 'update-status success';
+                    statusEl.textContent = `✅ Документ загружен (${result.content.length} символов)`;
+                } else {
+                    document.getElementById('docContent').value = '# Новый документ\n\nВведите содержание документа...';
+                    statusEl.className = 'update-status success';
+                    statusEl.textContent = `✅ Документ загружен (шаблон)`;
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки:', error);
+                statusEl.className = 'update-status error';
+                statusEl.textContent = `❌ Ошибка загрузки: ${error.message}`;
+            }
+        }
+        
+        async function saveDocumentToDisk() {
+            if (!docsMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const fileSelect = document.getElementById('docFileSelect');
+            const selectedFile = fileSelect.value;
+            const selectedFileName = fileSelect.options[fileSelect.selectedIndex].text;
+            const content = document.getElementById('docContent').value;
+            
+            if (!content.trim()) {
+                alert('Содержание документа не может быть пустым');
+                return;
+            }
+            
+            const statusEl = document.getElementById('docsStatus');
+            statusEl.className = 'update-status';
+            statusEl.textContent = `⏳ Сохранение ${selectedFileName} на диск...`;
+            
+            try {
+                console.log('📤 Сохранение документа:', { 
+                    fileName: selectedFile, 
+                    machine_id: docsMachine,
+                    contentLength: content.length 
+                });
+                
+                const response = await fetch(SAVE_DOCUMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fileName: selectedFile,
+                        machine_id: docsMachine,
+                        content: content
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ Документ сохранен:', result);
+                
+                statusEl.className = 'update-status success';
+                statusEl.textContent = `✅ Документ сохранен на диске!`;
+                
+            } catch (error) {
+                console.error('❌ Ошибка сохранения:', error);
+                statusEl.className = 'update-status error';
+                statusEl.textContent = `❌ Ошибка сохранения: ${error.message}`;
+            }
+        }
+        
+        async function updateDocumentKnowledgeBase() {
+            if (!docsMachine) {
+                alert('Сначала выберите станок');
+                return;
+            }
+            
+            const fileSelect = document.getElementById('docFileSelect');
+            const selectedFile = fileSelect.value;
+            const selectedFileName = fileSelect.options[fileSelect.selectedIndex].text;
+            
+            const statusEl = document.getElementById('docsStatus');
+            statusEl.className = 'update-status';
+            statusEl.textContent = `⏳ Обновление базы знаний из ${selectedFileName}...`;
+            
+            try {
+                console.log('📤 Обновление базы знаний:', { fileName: selectedFile, machine_id: docsMachine });
+                
+                const response = await fetch(UPDATE_DOCUMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fileName: selectedFile,
+                        machine_id: docsMachine
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ База знаний обновлена:', result);
+                
+                statusEl.className = 'update-status success';
+                statusEl.textContent = `✅ База знаний обновлена! (${result.chunksCount || 0} чанков)`;
+                
+            } catch (error) {
+                console.error('❌ Ошибка обновления:', error);
+                statusEl.className = 'update-status error';
+                statusEl.textContent = `❌ Ошибка: ${error.message}`;
+            }
+        }
+        
+        // Инициализация
+        window.onload = function() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+            
+            loadFromLocalStorage();
+            
+            document.getElementById('journalMachineA').addEventListener('click', () => selectJournalMachine('A'));
+            document.getElementById('journalMachineB').addEventListener('click', () => selectJournalMachine('B'));
+            
+            document.getElementById('tabBreakdowns').addEventListener('click', () => switchJournalTab('breakdowns'));
+            document.getElementById('tabInspections').addEventListener('click', () => switchJournalTab('inspections'));
+            document.getElementById('tabReplacements').addEventListener('click', () => switchJournalTab('replacements'));
+            
+            document.getElementById('docsMachineA').addEventListener('click', () => selectDocsMachine('A'));
+            document.getElementById('docsMachineB').addEventListener('click', () => selectDocsMachine('B'));
+            
+            setTimeout(() => {
+                if (!journalMachine) {
+                    selectJournalMachine('A');
+                }
+                if (!docsMachine) {
+                    selectDocsMachine('A');
+                }
+            }, 500);
+        };
+    </script>
+</body>
+</html>
