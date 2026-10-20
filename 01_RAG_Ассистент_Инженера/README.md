@@ -1,5 +1,7 @@
 # RAG-Ассистент Инженера
 
+**Живое демо:** [Открыть интерфейс](https://lapina-ai.github.io/ai-automation-portfolio/01_RAG_Ассистент_Инженера/index.html) 
+
 Корпоративная RAG-платформа (On-Premise) для поиска по технической документации и журналам обслуживания станков (HAAS VF-2, TRUMPF TruLaser 3030).
 
 **Стек:** n8n, Qdrant, LM Studio (Mistral-7B), Docker, Python (Flask).
@@ -21,4 +23,4 @@
 - Вкладка «Журнал учёта» для добавления поломок и осмотров.
 - Вкладка «Документация» для редактирования файлов.
 
-**Живое демо:** [Открыть интерфейс](https://lapina-ai.github.io/ai-automation-portfolio/01_RAG_Ассистент_Инженера/index.html)
+
